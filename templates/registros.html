@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <nav>
+          <ul>
+            <li><strong>Sistema de Controle</strong></li>
+          </ul>
+          <ul>
+            <li><a href="{{ url_for('index') }}">Novo Cadastro</a></li>
+            <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
+          </ul>
+        </nav>
+        <hr>
+
+        <h1>Registros de Operações</h1>
+        <figure>
+            <table role="grid">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Valor Quitado</th>
+                        <th>Vendedor</th>
+                        <th>% Investidor</th>
+                        <th>% Comissão</th>
+                        <th>Líquido Empresa</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for registro in registros %}
+                    <tr>
+                        <td>{{ registro.nome_cliente }}</td>
+                        <td>{{ "R$ {:,.2f}".format(registro.valor_quitado).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
+                        <td>{{ registro.vendedor }}</td>
+                        <td>{{ registro.percentual_investidor }}%</td>
+                        <td>{{ registro.percentual_comissao }}%</td>
+                        <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
+                        <td>{{ registro.data_quitacao }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7">Nenhum registro encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </figure>
+    </main>
+</body>
+</html>

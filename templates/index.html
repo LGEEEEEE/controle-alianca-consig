@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Operação</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+</head>
+<body>
+    <main class="container">
+        <nav>
+          <ul>
+            <li><strong>Sistema de Controle</strong></li>
+          </ul>
+          <ul>
+            <li><a href="{{ url_for('registros') }}">Ver Registros</a></li>
+            <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
+          </ul>
+        </nav>
+        <hr>
+
+        <h1>Cadastro de Operação</h1>
+        <form action="/" method="post">
+            <div class="grid">
+                <label for="nome_cliente">Nome do Cliente
+                    <input type="text" id="nome_cliente" name="nome_cliente" required>
+                </label>
+                <label for="cpf">CPF
+                    <input type="text" id="cpf" name="cpf" required>
+                </label>
+            </div>
+
+            <div class="grid">
+                 <label for="valor_quitado">Valor Quitado (R$)
+                    <input type="number" id="valor_quitado" name="valor_quitado" step="0.01" required>
+                </label>
+                <label for="data_quitacao">Data da Quitação
+                    <input type="date" id="data_quitacao" name="data_quitacao" required>
+                </label>
+            </div>
+
+            <div class="grid">
+                <label for="supervisor">Supervisor
+                    <input type="text" id="supervisor" name="supervisor" required>
+                </label>
+                <label for="vendedor">Vendedor
+                    <input type="text" id="vendedor" name="vendedor" required>
+                </label>
+            </div>
+
+            <label for="investidor">Investidor
+                <input type="text" id="investidor" name="investidor" required>
+            </label>
+
+            <div class="grid">
+                <label for="percentual_investidor">% Investidor
+                    <select id="percentual_investidor" name="percentual_investidor" required>
+                        <option value="7">7%</option>
+                        <option value="8" selected>8%</option>
+                        <option value="9">9%</option>
+                        <option value="10">10%</option>
+                    </select>
+                </label>
+                <label for="percentual_comissao">% Comissão
+                    <select id="percentual_comissao" name="percentual_comissao" required>
+                        <option value="20">20%</option>
+                        <option value="30" selected>30%</option>
+                    </select>
+                </label>
+                <label for="produto">Produto
+                    <input type="text" id="produto" name="produto" required>
+                </label>
+            </div>
+            
+            <label for="investidor_fora">
+                <input type="checkbox" id="investidor_fora" name="investidor_fora" value="1">
+                Investidor de Fora (taxa de 4.5%)
+            </label>
+
+            <hr>
+            <h3>Líquido para Empresa: <span id="resultado_liquido">R$ 0,00</span></h3>
+            <hr>
+            
+            <button type="submit">Cadastrar Operação</button>
+        </form>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/calculo.js') }}"></script>
+</body>
+</html>
