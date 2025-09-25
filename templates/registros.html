@@ -29,9 +29,10 @@
                     <tr>
                         <th>Cliente</th>
                         <th>Valor Contrato</th>
-                        <th>Vendedor</th>
-                        <th>% Comissão</th>
                         <th>Líquido Empresa</th>
+                        <th>Vendedor</th>
+                        <th>Investidor</th>
+                        <th>Valor Quitado</th>
                         <th>Data</th>
                     </tr>
                 </thead>
@@ -40,14 +41,15 @@
                     <tr>
                         <td>{{ registro.nome_cliente }}</td>
                         <td>{{ "R$ {:,.2f}".format(registro.valor_contrato).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
-                        <td>{{ registro.vendedor }}</td>
-                        <td>{{ registro.percentual_comissao }}%</td>
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
+                        <td>{{ registro.vendedor }}</td>
+                        <td>{{ registro.investidor }}</td>
+                        <td>{{ "R$ {:,.2f}".format(registro.valor_quitado).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
                         <td>{{ registro.data_quitacao }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6">
+                        <td colspan="7">
                             {% if search_query %}
                                 Nenhum registro encontrado para a busca: <strong>"{{ search_query }}"</strong>.
                             {% else %}

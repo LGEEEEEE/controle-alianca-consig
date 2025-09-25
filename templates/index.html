@@ -24,23 +24,24 @@
                 <label for="cpf">CPF<input type="text" id="cpf" name="cpf" required></label>
             </div>
             
-            <div class="grid">
-                <label for="valor_contrato">Valor de Contrato (R$)<input type="number" id="valor_contrato" name="valor_contrato" step="0.01" placeholder="Ex: 25000.00" required></label>
-                <label for="custo_produto">Custo do Produto (R$)<input type="number" id="custo_produto" name="custo_produto" step="0.01" placeholder="Ex: 500.00" required></label>
-                <label for="percentual_comissao">% Comissão<select id="percentual_comissao" name="percentual_comissao" required><option value="20">20%</option><option value="30">30%</option></select></label>
-            </div>
-            <hr>
+            <fieldset>
+                <legend>Dados Financeiros Principais</legend>
+                <div class="grid">
+                    <label for="valor_contrato">Valor de Contrato (R$)<input type="number" id="valor_contrato" name="valor_contrato" step="0.01" placeholder="Ex: 25000.00" required></label>
+                    <label for="custo_produto">Custo do Produto (R$)<input type="number" id="custo_produto" name="custo_produto" step="0.01" placeholder="Ex: 500.00" required></label>
+                    <label for="percentual_comissao">% Comissão<select id="percentual_comissao" name="percentual_comissao" required><option value="20">20%</option><option value="30">30%</option></select></label>
+                </div>
+            </fieldset>
             
-            <details>
-                <summary>Detalhes do Investidor (Opcional)</summary>
+            <fieldset>
+                <legend>Dados do Investidor (Informativo)</legend>
                 <div class="grid">
                     <label for="investidor">Investidor<input type="text" id="investidor" name="investidor"></label>
                     <label for="valor_quitado">Valor Quitado (R$)<input type="number" id="valor_quitado" name="valor_quitado" step="0.01"></label>
                     <label for="percentual_investidor">% Investidor<select id="percentual_investidor" name="percentual_investidor"><option value="7">7%</option><option value="8">8%</option><option value="9">9%</option><option value="10">10%</option></select></label>
                 </div>
-                <label for="investidor_fora"><input type="checkbox" id="investidor_fora" name="investidor_fora" value="1">Investidor de Fora (taxa de 4.5%)</label>
-            </details>
-            <hr>
+                <label for="investidor_fora"><input type="checkbox" id="investidor_fora" name="investidor_fora" value="1">Investidor de Fora</label>
+            </fieldset>
             
             <div class="grid">
                 <label for="supervisor">Supervisor<input type="text" id="supervisor" name="supervisor" required></label>
@@ -48,6 +49,7 @@
                 <label for="data_quitacao">Data da Operação<input type="date" id="data_quitacao" name="data_quitacao" required></label>
             </div>
             
+            <hr>
             <h3>Líquido para Empresa: <span id="resultado_liquido">R$ 0,00</span></h3>
             <button type="submit">Cadastrar Operação</button>
         </form>
