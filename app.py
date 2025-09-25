@@ -4,7 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from dotenv import load_dotenv # Nova importação
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user # Novas importações
-from werkzeug.security import check_password_hash # Nova importação
+from werkzeug.security import check_password_hash # Nova importação 
+from sqlalchemy import or_
+from sqlalchemy.sql import func
 
 # Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
@@ -122,7 +124,34 @@ def index():
     return render_template('index.html')
 
 @app.route('/registros')
-@login_required # <-- E aqui também!
+@login_required
 def registros():
-    registros_db = Registro.query.order_by(Registro.criado_em.desc()).all()
-    return render_template('registros.html', registros=registros_db)
+    # Pega o termo de busca da URL (ex: /registros?q=Joao)
+    search_query = request.args.get('q')
+
+    # Começa com a query base para buscar todos os registros
+    base_query = Registro.query
+
+    if search_query:
+        # Se existe uma busca, preparamos o termo para a consulta
+        search_pattern = f"%{search_query}%"
+
+        # Filtramos a query base. A busca será feita em todos os campos abaixo.
+        # O 'or_' significa que o termo pode aparecer em QUALQUER um dos campos.
+        # O 'ilike' faz a busca ser case-insensitive (não diferencia maiúsculas de minúsculas).
+        registros_db = base_query.filter(
+            or_(
+                Registro.nome_cliente.ilike(search_pattern),
+                Registro.cpf.ilike(search_pattern),
+                Registro.vendedor.ilike(search_pattern),
+                Registro.supervisor.ilike(search_pattern),
+                Registro.investidor.ilike(search_pattern),
+                Registro.produto.ilike(search_pattern)
+            )
+        ).order_by(Registro.criado_em.desc()).all()
+    else:
+        # Se não há busca, apenas pega todos os registros
+        registros_db = base_query.order_by(Registro.criado_em.desc()).all()
+
+    # Passamos os registros E o termo de busca para o template
+    return render_template('registros.html', registros=registros_db, search_query=search_query)

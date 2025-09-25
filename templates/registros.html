@@ -20,6 +20,13 @@
         <hr>
 
         <h1>Registros de Operações</h1>
+
+        <form method="get" action="{{ url_for('registros') }}">
+            <div class="grid">
+                <input type="search" id="q" name="q" placeholder="Pesquisar por Nome, CPF, Vendedor..." value="{{ search_query or '' }}">
+                <button type="submit">Pesquisar</button>
+            </div>
+        </form>
         <figure>
             <table role="grid">
                 <thead>
@@ -46,7 +53,13 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="7">Nenhum registro encontrado.</td>
+                        <td colspan="7">
+                            {% if search_query %}
+                                Nenhum registro encontrado para a busca: <strong>"{{ search_query }}"</strong>.
+                            {% else %}
+                                Nenhum registro cadastrado.
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
