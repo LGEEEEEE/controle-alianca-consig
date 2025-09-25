@@ -9,18 +9,14 @@
 <body>
     <main class="container">
         <nav>
-          <ul>
-            <li><strong>Sistema de Controle</strong></li>
-          </ul>
+          <ul><li><strong>Sistema de Controle</strong></li></ul>
           <ul>
             <li><a href="{{ url_for('index') }}">Novo Cadastro</a></li>
             <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
           </ul>
         </nav>
         <hr>
-
         <h1>Registros de Operações</h1>
-
         <form method="get" action="{{ url_for('registros') }}">
             <div class="grid">
                 <input type="search" id="q" name="q" placeholder="Pesquisar por Nome, CPF, Vendedor..." value="{{ search_query or '' }}">
@@ -32,9 +28,8 @@
                 <thead>
                     <tr>
                         <th>Cliente</th>
-                        <th>Valor Quitado</th>
+                        <th>Valor Contrato</th>
                         <th>Vendedor</th>
-                        <th>% Investidor</th>
                         <th>% Comissão</th>
                         <th>Líquido Empresa</th>
                         <th>Data</th>
@@ -44,16 +39,15 @@
                     {% for registro in registros %}
                     <tr>
                         <td>{{ registro.nome_cliente }}</td>
-                        <td>{{ "R$ {:,.2f}".format(registro.valor_quitado).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
+                        <td>{{ "R$ {:,.2f}".format(registro.valor_contrato).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
                         <td>{{ registro.vendedor }}</td>
-                        <td>{{ registro.percentual_investidor }}%</td>
                         <td>{{ registro.percentual_comissao }}%</td>
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                         <td>{{ registro.data_quitacao }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             {% if search_query %}
                                 Nenhum registro encontrado para a busca: <strong>"{{ search_query }}"</strong>.
                             {% else %}
