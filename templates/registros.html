@@ -9,7 +9,7 @@
 <body>
     <main class="container">
         <nav>
-          <ul><li><strong>Sistema de Controle</strong></li></ul>
+          <ul><li><img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo" style="height: 40px;"></li></ul>
           <ul>
             <li><a href="{{ url_for('index') }}">Novo Cadastro</a></li>
             <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
@@ -22,21 +22,22 @@
             <details open>
                 <summary>Filtros e Pesquisa</summary>
                 <div class="grid">
-                    <input type="search" name="q" placeholder="Pesquisar Nome, CPF, Vendedor..." value="{{ search_query or '' }}">
+                    <input type="search" name="q" placeholder="Pesquisar Nome, CPF, Vendedor..." value="{{ request_args.get('q', '') }}">
                     <select name="supervisor">
                         <option value="">Todos os Supervisores</option>
                         {% for s in supervisores %}
-                            <option value="{{ s[0] }}" {% if supervisor_filter == s[0] %}selected{% endif %}>{{ s[0] }}</option>
+                            <option value="{{ s[0] }}" {% if request_args.get('supervisor') == s[0] %}selected{% endif %}>{{ s[0] }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="grid">
-                    <label>Data Início <input type="date" name="start_date" value="{{ start_date or '' }}"></label>
-                    <label>Data Fim <input type="date" name="end_date" value="{{ end_date or '' }}"></label>
+                    <label>Data Início <input type="date" name="start_date" value="{{ request_args.get('start_date', '') }}"></label>
+                    <label>Data Fim <input type="date" name="end_date" value="{{ request_args.get('end_date', '') }}"></label>
                 </div>
                 <div class="grid">
                     <button type="submit">Filtrar</button>
                     <a href="{{ url_for('registros') }}" role="button" class="secondary">Limpar Filtros</a>
+                    <a href="{{ url_for('download_pdf', **request_args) }}" role="button" class="contrast">Baixar Relatório (PDF)</a>
                 </div>
             </details>
         </form>
@@ -63,7 +64,8 @@
                         <th>Líquido Empresa</th>
                         <th>Vendedor</th>
                         <th>Data</th>
-                        <th>Ações</th> </tr>
+                        <th>Ações</th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for registro in registros %}

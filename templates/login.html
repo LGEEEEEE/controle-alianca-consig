@@ -8,27 +8,28 @@
 </head>
 <body>
     <main class="container">
-        <article class="grid" style="max-width: 450px; margin: 4rem auto;">
-            <div>
+        <article class="grid" style="max-width: 450px; margin: 2rem auto;">
+            <div style="text-align: center;">
+                <img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo da Empresa" style="max-width: 200px; margin-bottom: 1rem;">
                 <hgroup>
                     <h1>Acessar Sistema</h1>
                     <h2>Por favor, insira suas credenciais.</h2>
                 </hgroup>
-
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <p><mark class="{{ category }}">{{ message }}</mark></p>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                <form action="{{ url_for('login') }}" method="post">
-                    <input type="text" name="username" placeholder="Usuário" aria-label="Usuário" required>
-                    <input type="password" name="password" placeholder="Senha" aria-label="Senha" required>
-                    <button type="submit" class="contrast">Entrar</button>
-                </form>
             </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <p><mark class="{{ category }}">{{ message }}</mark></p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="post">
+                <input type="text" name="username" placeholder="Usuário" aria-label="Usuário" required>
+                <input type="password" name="password" placeholder="Senha" aria-label="Senha" required>
+                <button type="submit" class="contrast">Entrar</button>
+            </form>
         </article>
     </main>
 </body>

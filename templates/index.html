@@ -9,7 +9,7 @@
 <body>
     <main class="container">
         <nav>
-          <ul><li><strong>Sistema de Controle</strong></li></ul>
+          <ul><li><img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo" style="height: 40px;"></li></ul>
           <ul>
             <li><a href="{{ url_for('registros') }}">Ver Registros</a></li>
             <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
@@ -40,7 +40,7 @@
                     <label for="valor_quitado">Valor Quitado (R$)<input type="number" id="valor_quitado" name="valor_quitado" step="0.01"></label>
                     <label for="percentual_investidor">% Investidor<select id="percentual_investidor" name="percentual_investidor"><option value="7">7%</option><option value="8">8%</option><option value="9">9%</option><option value="10">10%</option></select></label>
                 </div>
-                <label for="investidor_fora"><input type="checkbox" id="investidor_fora" name="investidor_fora" value="1">Investidor de Fora(Taxa de 4,5%)</label>
+                <label for="investidor_fora"><input type="checkbox" id="investidor_fora" name="investidor_fora" value="1">Investidor de Fora</label>
             </fieldset>
             
             <div class="grid">
