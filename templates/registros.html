@@ -9,7 +9,9 @@
 <body>
     <main class="container">
         <nav>
-          <ul><li><img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo" style="height: 40px;"></li></ul>
+          <ul>
+            <li><img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo" style="height: 60px;"></li>
+          </ul>
           <ul>
             <li><a href="{{ url_for('index') }}">Novo Cadastro</a></li>
             <li><a href="{{ url_for('logout') }}" role="button" class="secondary outline">Sair</a></li>
