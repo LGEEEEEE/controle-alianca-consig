@@ -16,13 +16,44 @@
           </ul>
         </nav>
         <hr>
-        <h1>Registros de Operações</h1>
+        <h1>Relatório de Operações</h1>
+
         <form method="get" action="{{ url_for('registros') }}">
-            <div class="grid">
-                <input type="search" id="q" name="q" placeholder="Pesquisar por Nome, CPF, Vendedor..." value="{{ search_query or '' }}">
-                <button type="submit">Pesquisar</button>
-            </div>
+            <details open>
+                <summary>Filtros e Pesquisa</summary>
+                <div class="grid">
+                    <input type="search" name="q" placeholder="Pesquisar Nome, CPF, Vendedor..." value="{{ search_query or '' }}">
+                    <select name="supervisor">
+                        <option value="">Todos os Supervisores</option>
+                        {% for s in supervisores %}
+                            <option value="{{ s[0] }}" {% if supervisor_filter == s[0] %}selected{% endif %}>{{ s[0] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="grid">
+                    <label>Data Início <input type="date" name="start_date" value="{{ start_date or '' }}"></label>
+                    <label>Data Fim <input type="date" name="end_date" value="{{ end_date or '' }}"></label>
+                </div>
+                <div class="grid">
+                    <button type="submit">Filtrar</button>
+                    <a href="{{ url_for('registros') }}" role="button" class="secondary">Limpar Filtros</a>
+                </div>
+            </details>
         </form>
+
+        <article>
+            <h3 style="text-align: center;">
+                Líquido Total (Filtro): 
+                <ins>{{ "R$ {:,.2f}".format(total_liquido).replace(",", "X").replace(".", ",").replace("X", ".") }}</ins>
+            </h3>
+        </article>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}{% for category, message in messages %}
+                <p><mark class="{{ category }}">{{ message }}</mark></p>
+            {% endfor %}{% endif %}
+        {% endwith %}
+
         <figure>
             <table role="grid">
                 <thead>
@@ -31,10 +62,8 @@
                         <th>Valor Contrato</th>
                         <th>Líquido Empresa</th>
                         <th>Vendedor</th>
-                        <th>Investidor</th>
-                        <th>Valor Quitado</th>
                         <th>Data</th>
-                    </tr>
+                        <th>Ações</th> </tr>
                 </thead>
                 <tbody>
                     {% for registro in registros %}
@@ -43,19 +72,16 @@
                         <td>{{ "R$ {:,.2f}".format(registro.valor_contrato).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                         <td>{{ registro.vendedor }}</td>
-                        <td>{{ registro.investidor }}</td>
-                        <td>{{ "R$ {:,.2f}".format(registro.valor_quitado).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
                         <td>{{ registro.data_quitacao }}</td>
+                        <td>
+                            <form action="{{ url_for('delete', id=registro.id) }}" method="post" style="margin: 0;">
+                                <button type="submit" class="secondary outline" onclick="return confirm('Tem certeza que deseja excluir este registro? A ação não pode ser desfeita.')">Excluir</button>
+                            </form>
+                        </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="7">
-                            {% if search_query %}
-                                Nenhum registro encontrado para a busca: <strong>"{{ search_query }}"</strong>.
-                            {% else %}
-                                Nenhum registro cadastrado.
-                            {% endif %}
-                        </td>
+                        <td colspan="6" style="text-align: center;">Nenhum registro encontrado para os filtros aplicados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
