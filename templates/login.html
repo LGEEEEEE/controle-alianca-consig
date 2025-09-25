@@ -8,14 +8,14 @@
 </head>
 <body>
     <main class="container">
-        <article class="grid" style="max-width: 450px; margin: 2rem auto;">
-            <div style="text-align: center;">
-                <img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo da Empresa" style="max-width: 250px; margin-bottom: 1rem;">
-                <hgroup>
-                    <h1>Acessar Sistema</h1>
-                    <h2>Por favor, insira suas credenciais.</h2>
-                </hgroup>
-            </div>
+        <article style="max-width: 450px; margin: 3rem auto; text-align: center;">
+            
+            <img src="{{ url_for('static', filename='images/logofooter.png') }}" alt="Logo da Empresa" style="max-width: 280px; margin-bottom: 2rem;">
+            
+            <hgroup>
+                <h1>Acessar Sistema</h1>
+                <p>Por favor, insira suas credenciais.</p>
+            </hgroup>
             
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
