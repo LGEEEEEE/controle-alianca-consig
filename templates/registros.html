@@ -77,16 +77,13 @@
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                         <td>{{ registro.vendedor }}</td>
                         <td>{{ registro.data_quitacao }}</td>
-                        <td>
+                        <td class="grid"> <a href="{{ url_for('edit', id=registro.id) }}" role="button" class="outline">Editar</a>
                             <form action="{{ url_for('delete', id=registro.id) }}" method="post" style="margin: 0;">
-                                <button type="submit" class="secondary outline" onclick="return confirm('Tem certeza que deseja excluir este registro? A ação não pode ser desfeita.')">Excluir</button>
+                                <button type="submit" class="secondary outline" onclick="return confirm('Tem certeza? A ação não pode ser desfeita.')">Excluir</button>
                             </form>
                         </td>
                     </tr>
                     {% else %}
-                    <tr>
-                        <td colspan="6" style="text-align: center;">Nenhum registro encontrado para os filtros aplicados.</td>
-                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

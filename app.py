@@ -6,26 +6,31 @@ from sqlalchemy import or_, func
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import check_password_hash
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 from datetime import datetime
 
+# Carrega as variáveis de ambiente do arquivo .env
 load_dotenv()
+
 app = Flask(__name__)
 
-# --- CONFIGURAÇÕES ---
+# --- CONFIGURAÇÕES GERAIS E DO BANCO DE DADOS ---
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///local_test.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# --- CONFIGURAÇÃO DO SISTEMA DE LOGIN ---
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 login_manager.login_message = "Por favor, faça o login para acessar esta página."
 login_manager.login_message_category = "info"
 
-# --- MODELO DO BANCO DE DADOS ---
+
+# --- MODELO DO BANCO DE DADOS (TABELA 'registros') ---
 class Registro(db.Model):
     __tablename__ = 'registros'
     id = db.Column(db.Integer, primary_key=True)
@@ -52,11 +57,14 @@ class User(UserMixin):
         self.password_hash = password_hash
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
 admin_user = User(id='1', username=os.environ.get('ADMIN_USERNAME'), password_hash=os.environ.get('ADMIN_PASSWORD_HASH'))
+
 @login_manager.user_loader
 def load_user(user_id):
     if user_id == '1': return admin_user
     return None
+
 with app.app_context():
     db.create_all()
 
@@ -80,24 +88,37 @@ def logout():
     flash('Você foi desconectado com sucesso.', 'success')
     return redirect(url_for('login'))
 
-# --- ROTA DE CADASTRO ---
-@app.route('/', methods=('GET', 'POST'))
+# --- ROTAS DA APLICAÇÃO ---
+
+# ROTA PRINCIPAL (CADASTRAR NOVA OPERAÇÃO)
+@app.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
     if request.method == 'POST':
+        # --- LÓGICA DE CÁLCULO ATUALIZADA ---
         valor_contrato = float(request.form.get('valor_contrato', 0))
+        valor_quitado = float(request.form.get('valor_quitado', 0))
         custo_produto = float(request.form.get('custo_produto', 0))
         percentual_comissao = int(request.form.get('percentual_comissao', 0))
+        
         valor_comissao = valor_contrato * (percentual_comissao / 100)
-        liquido_empresa = valor_contrato - valor_comissao - custo_produto
+        liquido_empresa = valor_contrato - valor_quitado - valor_comissao - custo_produto
+        # --- FIM DA LÓGICA ---
+
         novo_registro = Registro(
-            valor_contrato=valor_contrato, custo_produto=custo_produto, liquido_empresa=liquido_empresa,
-            nome_cliente=request.form['nome_cliente'], cpf=request.form['cpf'],
-            valor_quitado=float(request.form.get('valor_quitado') or 0),
-            data_quitacao=request.form['data_quitacao'], supervisor=request.form['supervisor'],
-            vendedor=request.form['vendedor'], investidor=request.form.get('investidor'),
+            valor_contrato=valor_contrato,
+            custo_produto=custo_produto,
+            liquido_empresa=liquido_empresa,
+            nome_cliente=request.form['nome_cliente'],
+            cpf=request.form['cpf'],
+            valor_quitado=valor_quitado,
+            data_quitacao=request.form['data_quitacao'],
+            supervisor=request.form['supervisor'],
+            vendedor=request.form['vendedor'],
+            investidor=request.form.get('investidor'),
             percentual_investidor=int(request.form.get('percentual_investidor') or 0),
-            percentual_comissao=percentual_comissao, investidor_fora='investidor_fora' in request.form
+            percentual_comissao=percentual_comissao,
+            investidor_fora='investidor_fora' in request.form
         )
         db.session.add(novo_registro)
         db.session.commit()
@@ -105,39 +126,40 @@ def index():
         return redirect(url_for('registros'))
     return render_template('index.html')
 
-# --- FUNÇÃO HELPER PARA FILTROS ---
-def get_filtered_query(args):
-    query = Registro.query
-    search_query = args.get('q')
-    start_date = args.get('start_date')
-    end_date = args.get('end_date')
-    supervisor_filter = args.get('supervisor')
-    if search_query:
-        search_pattern = f"%{search_query}%"
-        query = query.filter(or_(Registro.nome_cliente.ilike(search_pattern), Registro.cpf.ilike(search_pattern), Registro.vendedor.ilike(search_pattern)))
-    if start_date:
-        query = query.filter(Registro.data_quitacao >= start_date)
-    if end_date:
-        query = query.filter(Registro.data_quitacao <= end_date)
-    if supervisor_filter:
-        query = query.filter(Registro.supervisor == supervisor_filter)
-    return query
-
-# --- ROTA DE REGISTROS ---
-@app.route('/registros')
+# ROTA PARA EDITAR UMA OPERAÇÃO
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
-def registros():
-    query = get_filtered_query(request.args)
-    total_liquido = query.with_entities(func.sum(Registro.liquido_empresa)).scalar() or 0.0
-    registros_db = query.order_by(Registro.criado_em.desc()).all()
-    supervisores = db.session.query(Registro.supervisor).distinct().order_by(Registro.supervisor).all()
-    return render_template('registros.html', 
-                           registros=registros_db, 
-                           supervisores=supervisores,
-                           total_liquido=total_liquido,
-                           request_args=request.args)
+def edit(id):
+    registro = Registro.query.get_or_404(id)
+    if request.method == 'POST':
+        # Atualiza os dados do registro com os valores do formulário
+        registro.nome_cliente = request.form['nome_cliente']
+        registro.cpf = request.form['cpf']
+        registro.data_quitacao = request.form['data_quitacao']
+        registro.supervisor = request.form['supervisor']
+        registro.vendedor = request.form['vendedor']
+        registro.investidor = request.form.get('investidor')
+        registro.percentual_investidor = int(request.form.get('percentual_investidor') or 0)
+        registro.investidor_fora = 'investidor_fora' in request.form
+        
+        # Atualiza os dados financeiros
+        registro.valor_contrato = float(request.form.get('valor_contrato', 0))
+        registro.valor_quitado = float(request.form.get('valor_quitado', 0))
+        registro.custo_produto = float(request.form.get('custo_produto', 0))
+        registro.percentual_comissao = int(request.form.get('percentual_comissao', 0))
 
-# --- ROTA DE EXCLUSÃO ---
+        # Recalcula o líquido com a lógica correta
+        valor_comissao = registro.valor_contrato * (registro.percentual_comissao / 100)
+        registro.liquido_empresa = registro.valor_contrato - registro.valor_quitado - valor_comissao - registro.custo_produto
+        
+        db.session.commit()
+        flash('Operação atualizada com sucesso!', 'success')
+        return redirect(url_for('registros'))
+    
+    # Se for um GET, apenas mostra o formulário preenchido com os dados do registro
+    return render_template('edit.html', registro=registro)
+
+# ROTA PARA EXCLUIR UMA OPERAÇÃO
 @app.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete(id):
@@ -151,7 +173,43 @@ def delete(id):
         flash('Erro ao excluir o registro.', 'danger')
     return redirect(url_for('registros'))
 
-# --- NOVA ROTA PARA DOWNLOAD DO PDF ---
+# FUNÇÃO AUXILIAR PARA APLICAR FILTROS
+def get_filtered_query(args):
+    query = Registro.query
+    search_query = args.get('q')
+    start_date = args.get('start_date')
+    end_date = args.get('end_date')
+    supervisor_filter = args.get('supervisor')
+
+    if search_query:
+        search_pattern = f"%{search_query}%"
+        query = query.filter(or_(Registro.nome_cliente.ilike(search_pattern), Registro.cpf.ilike(search_pattern), Registro.vendedor.ilike(search_pattern)))
+    if start_date:
+        query = query.filter(Registro.data_quitacao >= start_date)
+    if end_date:
+        query = query.filter(Registro.data_quitacao <= end_date)
+    if supervisor_filter:
+        query = query.filter(Registro.supervisor == supervisor_filter)
+    
+    return query
+
+# ROTA DE RELATÓRIOS (VISUALIZAR REGISTROS)
+@app.route('/registros')
+@login_required
+def registros():
+    query = get_filtered_query(request.args)
+    
+    total_liquido = query.with_entities(func.sum(Registro.liquido_empresa)).scalar() or 0.0
+    registros_db = query.order_by(Registro.criado_em.desc()).all()
+    supervisores = db.session.query(Registro.supervisor).distinct().order_by(Registro.supervisor).all()
+    
+    return render_template('registros.html', 
+                           registros=registros_db, 
+                           supervisores=supervisores,
+                           total_liquido=total_liquido,
+                           request_args=request.args)
+
+# ROTA PARA DOWNLOAD DO RELATÓRIO EM PDF
 @app.route('/download_pdf')
 @login_required
 def download_pdf():
@@ -159,10 +217,8 @@ def download_pdf():
     registros = query.order_by(Registro.data_quitacao.asc()).all()
     total_liquido = query.with_entities(func.sum(Registro.liquido_empresa)).scalar() or 0.0
 
-    # Caminho absoluto para a logo, necessário para o WeasyPrint
     logo_path = url_for('static', filename='images/logofooter.png', _external=True)
     
-    # Renderiza o template HTML com os dados
     html_renderizado = render_template(
         'report_template.html', 
         registros=registros,
@@ -172,12 +228,14 @@ def download_pdf():
         logo_path=logo_path
     )
     
-    # Gera o PDF a partir do HTML
     pdf = HTML(string=html_renderizado, base_url=request.base_url).write_pdf()
 
-    # Retorna o PDF para o navegador
     return Response(
         pdf,
         mimetype='application/pdf',
         headers={'Content-Disposition': 'attachment;filename=relatorio_operacoes.pdf'}
     )
+
+# --- EXECUÇÃO DA APLICAÇÃO ---
+if __name__ == '__main__':
+    app.run(debug=True)
