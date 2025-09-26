@@ -1,5 +1,6 @@
 import os
 import io
+import base64
 from flask import Flask, render_template, request, url_for, redirect, flash, Response
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_, func
@@ -95,7 +96,6 @@ def logout():
 @login_required
 def index():
     if request.method == 'POST':
-        # --- LÓGICA DE CÁLCULO ATUALIZADA ---
         valor_contrato = float(request.form.get('valor_contrato', 0))
         valor_quitado = float(request.form.get('valor_quitado', 0))
         custo_produto = float(request.form.get('custo_produto', 0))
@@ -103,7 +103,6 @@ def index():
         
         valor_comissao = valor_contrato * (percentual_comissao / 100)
         liquido_empresa = valor_contrato - valor_quitado - valor_comissao - custo_produto
-        # --- FIM DA LÓGICA ---
 
         novo_registro = Registro(
             valor_contrato=valor_contrato,
@@ -132,7 +131,6 @@ def index():
 def edit(id):
     registro = Registro.query.get_or_404(id)
     if request.method == 'POST':
-        # Atualiza os dados do registro com os valores do formulário
         registro.nome_cliente = request.form['nome_cliente']
         registro.cpf = request.form['cpf']
         registro.data_quitacao = request.form['data_quitacao']
@@ -142,13 +140,11 @@ def edit(id):
         registro.percentual_investidor = int(request.form.get('percentual_investidor') or 0)
         registro.investidor_fora = 'investidor_fora' in request.form
         
-        # Atualiza os dados financeiros
         registro.valor_contrato = float(request.form.get('valor_contrato', 0))
         registro.valor_quitado = float(request.form.get('valor_quitado', 0))
         registro.custo_produto = float(request.form.get('custo_produto', 0))
         registro.percentual_comissao = int(request.form.get('percentual_comissao', 0))
 
-        # Recalcula o líquido com a lógica correta
         valor_comissao = registro.valor_contrato * (registro.percentual_comissao / 100)
         registro.liquido_empresa = registro.valor_contrato - registro.valor_quitado - valor_comissao - registro.custo_produto
         
@@ -156,7 +152,6 @@ def edit(id):
         flash('Operação atualizada com sucesso!', 'success')
         return redirect(url_for('registros'))
     
-    # Se for um GET, apenas mostra o formulário preenchido com os dados do registro
     return render_template('edit.html', registro=registro)
 
 # ROTA PARA EXCLUIR UMA OPERAÇÃO
@@ -217,15 +212,21 @@ def download_pdf():
     registros = query.order_by(Registro.data_quitacao.asc()).all()
     total_liquido = query.with_entities(func.sum(Registro.liquido_empresa)).scalar() or 0.0
 
-    logo_path = url_for('static', filename='images/logofooter.png', _external=True)
-    
+    logo_data_uri = None
+    try:
+        with open('static/images/logoheader.png', 'rb') as image_file:
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+            logo_data_uri = f'data:image/png;base64,{encoded_string}'
+    except FileNotFoundError:
+        logo_data_uri = ''
+
     html_renderizado = render_template(
         'report_template.html', 
         registros=registros,
         total_liquido=total_liquido,
         data_hoje=datetime.now().strftime('%d/%m/%Y'),
         request_args=request.args,
-        logo_path=logo_path
+        logo_data_uri=logo_data_uri
     )
     
     pdf = HTML(string=html_renderizado, base_url=request.base_url).write_pdf()

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <title>Relatório de Operações</title>
@@ -8,26 +9,31 @@
             size: A4;
             margin: 1.5cm;
         }
+
         body {
             font-family: 'Helvetica Neue', Arial, sans-serif;
             font-size: 10pt;
             color: #333;
         }
+
         .header {
             text-align: center;
             margin-bottom: 20px;
             border-bottom: 2px solid #007bff;
             padding-bottom: 10px;
         }
+
         .header img {
             /* Logo ajustada, maior para PDF */
-            max-height: 90px; 
+            max-height: 90px;
             margin-bottom: 10px;
         }
+
         .header h1 {
             margin: 0;
             color: #007bff;
         }
+
         .report-info {
             margin-bottom: 20px;
             padding: 10px;
@@ -35,30 +41,37 @@
             border: 1px solid #dee2e6;
             border-radius: 5px;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th, td {
+
+        th,
+        td {
             border: 1px solid #ccc;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #007bff;
             color: white;
             font-weight: bold;
         }
+
         tr:nth-child(even) {
             background-color: #f2f2f2;
         }
+
         .total-summary {
             margin-top: 20px;
             text-align: right;
             font-size: 14pt;
             font-weight: bold;
         }
+
         .footer {
             position: fixed;
             bottom: -30px;
@@ -70,11 +83,14 @@
         }
     </style>
 </head>
+
 <body>
+
     <div class="header">
-        <img src="{{ logo_path }}" alt="Logo da Empresa">
+        <img src="{{ logo_data_uri }}" alt="Logo da Empresa">
         <h1>Relatório de Operações</h1>
     </div>
+
 
     <div class="report-info">
         <strong>Data de Emissão:</strong> {{ data_hoje }}<br>
@@ -83,7 +99,7 @@
             {% if request_args.q %}<li>Busca: "{{ request_args.q }}"</li>{% endif %}
             {% if request_args.supervisor %}<li>Supervisor: "{{ request_args.supervisor }}"</li>{% endif %}
             {% if request_args.start_date or request_args.end_date %}
-                <li>Período: de {{ request_args.start_date or 'Início' }} até {{ request_args.end_date or 'Fim' }}</li>
+            <li>Período: de {{ request_args.start_date or 'Início' }} até {{ request_args.end_date or 'Fim' }}</li>
             {% endif %}
             {% if not request_args %}<li>Nenhum filtro aplicado.</li>{% endif %}
         </ul>
@@ -124,4 +140,5 @@
         Relatório gerado pelo Sistema de Controle - Página {{ page_num }}
     </div>
 </body>
+
 </html>

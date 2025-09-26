@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registros</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <style>
+        /* Estilo para alinhar os botões de ação */
+        .actions-cell {
+            display: flex;
+            gap: 0.5rem; /* Espaço entre os botões */
+            flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas pequenas */
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <main class="container">
@@ -77,13 +86,20 @@
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                         <td>{{ registro.vendedor }}</td>
                         <td>{{ registro.data_quitacao }}</td>
-                        <td class="grid"> <a href="{{ url_for('edit', id=registro.id) }}" role="button" class="outline">Editar</a>
-                            <form action="{{ url_for('delete', id=registro.id) }}" method="post" style="margin: 0;">
-                                <button type="submit" class="secondary outline" onclick="return confirm('Tem certeza? A ação não pode ser desfeita.')">Excluir</button>
-                            </form>
+                        
+                        <td>
+                            <div class="actions-cell">
+                                <a href="{{ url_for('edit', id=registro.id) }}" role="button" class="outline" style="margin: 0;">Editar</a>
+                                <form action="{{ url_for('delete', id=registro.id) }}" method="post" style="margin: 0;">
+                                    <button type="submit" class="secondary outline" onclick="return confirm('Tem certeza? A ação não pode ser desfeita.')">Excluir</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center;">Nenhum registro encontrado para os filtros aplicados.</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
