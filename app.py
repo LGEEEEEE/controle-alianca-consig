@@ -50,6 +50,11 @@ class Registro(db.Model):
     custo_produto = db.Column(db.Float, nullable=False)
     liquido_empresa = db.Column(db.Float, nullable=False)
 
+    # --- NOVOS CAMPOS ADICIONADOS ---
+    bancos_quitados = db.Column(db.String(200), nullable=True)
+    banco_contrato = db.Column(db.String(200), nullable=True)
+    agencia = db.Column(db.String(100), nullable=True)
+
 # --- MODELO DE USUÁRIO E AUTENTICAÇÃO ---
 class User(UserMixin):
     def __init__(self, id, username, password_hash):
@@ -117,7 +122,12 @@ def index():
             investidor=request.form.get('investidor'),
             percentual_investidor=int(request.form.get('percentual_investidor') or 0),
             percentual_comissao=percentual_comissao,
-            investidor_fora='investidor_fora' in request.form
+            investidor_fora='investidor_fora' in request.form,
+            
+            # --- LÓGICA PARA NOVOS CAMPOS ---
+            bancos_quitados=request.form.get('bancos_quitados'),
+            banco_contrato=request.form.get('banco_contrato'),
+            agencia=request.form.get('agencia')
         )
         db.session.add(novo_registro)
         db.session.commit()
@@ -139,6 +149,11 @@ def edit(id):
         registro.investidor = request.form.get('investidor')
         registro.percentual_investidor = int(request.form.get('percentual_investidor') or 0)
         registro.investidor_fora = 'investidor_fora' in request.form
+        
+        # --- LÓGICA PARA NOVOS CAMPOS ---
+        registro.bancos_quitados = request.form.get('bancos_quitados')
+        registro.banco_contrato = request.form.get('banco_contrato')
+        registro.agencia = request.form.get('agencia')
         
         registro.valor_contrato = float(request.form.get('valor_contrato', 0))
         registro.valor_quitado = float(request.form.get('valor_quitado', 0))

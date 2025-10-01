@@ -72,6 +72,21 @@
                 </label>
             </fieldset>
             
+            <fieldset>
+                <legend>Detalhes da Operação</legend>
+                <label for="bancos_quitados">Bancos Quitados
+                    <input type="text" id="bancos_quitados" name="bancos_quitados" value="{{ registro.bancos_quitados or '' }}">
+                </label>
+                <div class="grid">
+                    <label for="banco_contrato">Banco de Contrato (onde rodou)
+                        <input type="text" id="banco_contrato" name="banco_contrato" value="{{ registro.banco_contrato or '' }}">
+                    </label>
+                    <label for="agencia">Agência
+                        <input type="text" id="agencia" name="agencia" value="{{ registro.agencia or '' }}">
+                    </label>
+                </div>
+            </fieldset>
+
             <div class="grid">
                 <label for="supervisor">Supervisor
                     <input type="text" id="supervisor" name="supervisor" value="{{ registro.supervisor }}" required>

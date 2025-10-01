@@ -6,13 +6,7 @@
     <title>Registros</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
     <style>
-        /* Estilo para alinhar os botões de ação */
-        .actions-cell {
-            display: flex;
-            gap: 0.5rem; /* Espaço entre os botões */
-            flex-wrap: wrap; /* Permite que os botões quebrem a linha em telas pequenas */
-            align-items: center;
-        }
+        .actions-cell { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
     </style>
 </head>
 <body>
@@ -71,7 +65,7 @@
                 <thead>
                     <tr>
                         <th>Cliente</th>
-                        <th>Valor Contrato</th>
+                        <th>Banco Contrato</th> <th>Valor Contrato</th>
                         <th>Líquido Empresa</th>
                         <th>Vendedor</th>
                         <th>Data</th>
@@ -82,7 +76,7 @@
                     {% for registro in registros %}
                     <tr>
                         <td>{{ registro.nome_cliente }}</td>
-                        <td>{{ "R$ {:,.2f}".format(registro.valor_contrato).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
+                        <td>{{ registro.banco_contrato or 'N/A' }}</td> <td>{{ "R$ {:,.2f}".format(registro.valor_contrato).replace(",", "X").replace(".", ",").replace("X", ".") }}</td>
                         <td><strong>{{ "R$ {:,.2f}".format(registro.liquido_empresa).replace(",", "X").replace(".", ",").replace("X", ".") }}</strong></td>
                         <td>{{ registro.vendedor }}</td>
                         <td>{{ registro.data_quitacao }}</td>
@@ -98,7 +92,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" style="text-align: center;">Nenhum registro encontrado para os filtros aplicados.</td>
+                        <td colspan="7" style="text-align: center;">Nenhum registro encontrado para os filtros aplicados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
